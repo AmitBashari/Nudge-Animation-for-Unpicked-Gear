@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Nudge Sword Loop</title>
+    <style>
+        /* General Scene Setup */
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1a1a2e; /* Dark background */
+            overflow: hidden;
+        }
+
+        /* 
+           The Master Timeline Setup (5 Seconds Total)
+           - Phase 1 (Up/Down): 0s to 4s (80% of timeline)
+           - Phase 2 (Stop+Classic Nudge+Flash): 4s to 5s (80% to 100% of timeline)
+           
+           We use separate containers for Y movement and the Nudge so they don't 
+           conflict. They share the exact same duration and loop to stay synced.
+        */
+        .y-axis-container {
+            animation: floatUpDown 5s linear infinite;
+        }
+
+        .nudge-container {
+            /* This handles the 'jolt' and slight rotation wiggle */
+            animation: classicNudge 5s ease-in-out infinite;
+        }
+
+        /* 
+           The Sword itself
+           It handles the base rotation (pointing UP) and the color flashes.
+        */
+        .sword {
+            font-size: 8rem;
+            display: inline-block;
+            
+            /* POINTY TIP UP: Default 🗡️ emoji points diagonally. 
+               135deg rotation points it straight up. */
+            transform: rotate(135deg); 
+
+            /* This handles the white flashes simultaneous with the nudge */
+            animation: flashWhite 5s linear infinite;
+        }
+
+        /* 
+           ===========================================
+           THE KEYFRAMES (The Animation Instructions)
+           ===========================================
+        */
+
+        /* 
+           PHASE 1: Floating Up and Down (0% to 80% of timeline)
+           Maintains the slower speed and slightly longer path requested previously (+/- 35px).
+        */
+        @keyframes floatUpDown {
+            /* Settle in middle for the start of cycle */
+            0% { transform: translateY(0); }
+
+            /* Cycle 1 (Up, Middle, Down, Middle) */
+            6.66%  { transform: translateY(-35px); } 
+            13.33% { transform: translateY(0); }     
+            20%    { transform: translateY(35px); }  
+            26.66% { transform: translateY(0); }     
+            
+            /* Cycle 2 */
+            33.33% { transform: translateY(-35px); }
+            40%    { transform: translateY(0); }
+            46.66% { transform: translateY(35px); }
+            53.33% { transform: translateY(0); }
+            
+            /* Cycle 3 */
+            60%    { transform: translateY(-35px); }
+            66.66% { transform: translateY(0); }
+            73.33% { transform: translateY(35px); }
+            
+            /* STOP: Settle in middle at 80% marks (4s into 5s loop) */
+            80%, 100% { transform: translateY(0); }
+        }
+
+        /* 
+           PHASE 2 (Movement): The Classic, Snappy Nudge (80% to 100%)
+           It's explosive. It shakes left/right, up/down, and rotates simultaneously 
+           over a very tight distance in just 1 second, then settles.
+        */
+        @keyframes classicNudge {
+            /* Still during Phase 1 floating */
+            0%, 80% { transform: translate(0, 0) rotate(0deg); }
+            
+            /* Nudge Start (Rapid shake) */
+            81% { transform: translate(-6px, 1px)   rotate(-3deg); } /* Initial jolt */
+            83% { transform: translate(6px, -1px)    rotate(3deg);  } /* Overshoot right */
+            85% { transform: translate(-4px, 0px)    rotate(-2deg); } /* Decaying shake */
+            87% { transform: translate(4px, 1px)     rotate(2deg);  }
+            89% { transform: translate(-2px, -1px)   rotate(-1deg); } /* Settling */
+            91% { transform: translate(1px, 0px)     rotate(0.5deg);}
+            
+            /* Settle back to center before the loop restarts */
+            95%, 100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* 
+           PHASE 2 (Visual): The White Flashes (Combined with Nudge)
+           Fires rapidly twice right as the 'jolt' starts at 81%.
+        */
+        @keyframes flashWhite {
+            0%, 80% { filter: brightness(1) invert(0); opacity: 1; } /* Normal */
+            
+            /* Flash 1 (81% to 83%) - Simultaneous with initial nudge jolt */
+            81% { filter: brightness(0) invert(1); opacity: 1; } /* Pure White */
+            83% { filter: brightness(1) invert(0); opacity: 1; } /* Normal */
+            
+            /* Flash 2 (85% to 87%) */
+            85% { filter: brightness(0) invert(1); opacity: 1; } /* Pure White */
+            87% { filter: brightness(1) invert(0); opacity: 1; } /* Normal */
+            
+            /* Normal for rest of loop */
+            90%, 100% { filter: brightness(1) invert(0); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Nested structure required to sync Y-floating and X/Rotation nudge loops -->
+    <div class="y-axis-container">
+        <div class="nudge-container">
+            <!-- The Sword emoji receives the color flash animation -->
+            <div class="sword">🗡️</div>
+        </div>
+    </div>
+
+</body>
+</html>
